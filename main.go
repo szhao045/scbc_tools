@@ -2,9 +2,9 @@ package main
 
 import (
 	"bufio"
+	"compress/gzip"
 	"fmt"
 	"os"
-	"readproccesor"
 )
 
 type ReadHolder struct {
@@ -33,7 +33,18 @@ func reader(pair PairedRead) map[Trios]int {
 		fmt.Println(err)
 		return nil
 	}
+	// Try to unzip the file
+	f1_unzip, err := gzip.NewReader(f1)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
 	f2, err := os.Open(read2)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	f2_unzip, err := gzip.NewReader(f2)
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -41,8 +52,8 @@ func reader(pair PairedRead) map[Trios]int {
 	// Close the file and garbage collect the file handle
 	defer f1.Close()
 	defer f2.Close()
-	scanner1 := bufio.NewScanner(f1)
-	scanner2 := bufio.NewScanner(f2)
+	scanner1 := bufio.NewScanner(f1_unzip)
+	scanner2 := bufio.NewScanner(f2_unzip)
 	// Initialize a counter
 	line := 1
 	wrong_trio_counter := 0
