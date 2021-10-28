@@ -83,6 +83,7 @@ func reader(pair PairedRead) map[Trios]int {
 			} else {
 				trio_holder[trio] = 1
 			}
+			//debug.FreeOSMemory()
 		}
 	}
 	return trio_holder
