@@ -1,4 +1,4 @@
-package readprocessor
+package main
 
 import (
 	"fmt"
@@ -9,17 +9,8 @@ import (
 )
 
 // struct for input reads
-type ReadHolder struct {
-	Seq1 string
-	Seq2 string
-}
 
 // Output struct for processed reads
-type Trios struct {
-	CellBC string
-	Umi    string
-	TBC    string
-}
 
 // Slice struct to hold the slice
 type Slice struct {
@@ -27,7 +18,7 @@ type Slice struct {
 	Y int
 }
 
-func ProcessRead(readInfo *ReadHolder) (Trios, error) {
+func ProcessRead(readInfo ReadHolder) (Trios, error) {
 	// get the read sequence
 	read1 := readInfo.Seq1
 	read2 := readInfo.Seq2
