@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"fmt"
 	"os"
+	"runtime"
 )
 
 type ReadHolder struct {
@@ -78,16 +79,35 @@ func reader(pair PairedRead) map[Trios]int {
 				wrong_trio_counter++
 			}
 			// Check if the trio is already in the map
-			if _, ok := trio_holder[trio]; ok {
-				trio_holder[trio]++
-			} else {
-				trio_holder[trio] = 1
+			if trio.TBC != "" {
+				if _, ok := trio_holder[trio]; ok {
+					trio_holder[trio]++
+				} else {
+					trio_holder[trio] = 1
+				}
 			}
 			//debug.FreeOSMemory()
+		}
+		if line%100000 == 0 {
+			PrintMemUsage()
 		}
 	}
 	return trio_holder
 
+}
+
+func PrintMemUsage() {
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
+	fmt.Printf("Alloc = %v MiB", bToMb(m.Alloc))
+	fmt.Printf("\tTotalAlloc = %v MiB", bToMb(m.TotalAlloc))
+	fmt.Printf("\tSys = %v MiB", bToMb(m.Sys))
+	fmt.Printf("\tNumGC = %v\n", m.NumGC)
+}
+
+func bToMb(b uint64) uint64 {
+	return b / 1024 / 1024
 }
 
 func main() {
@@ -95,6 +115,7 @@ func main() {
 	read1_dir := os.Args[1]
 	read2_dir := os.Args[2]
 	fileName := PairedRead{read1_dir, read2_dir}
+	PrintMemUsage()
 	// Call the reader function
 	trio_holder := reader(fileName)
 	// Print the files
